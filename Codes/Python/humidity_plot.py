@@ -13,7 +13,7 @@ while True:
     try:
         h, _, _, _ = map(float, line.split(','))
         humidity.append(h)
-        temps = humidity[-100:]
+        humidity = humidity[-100:]
         plt.clf()
         plt.plot(humidity)
         plt.title("Humidity")
