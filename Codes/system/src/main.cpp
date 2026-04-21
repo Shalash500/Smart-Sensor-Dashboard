@@ -41,7 +41,7 @@ void loop() {
   digitalWrite(trig_pin, HIGH);
   delayMicroseconds(10);
   digitalWrite(trig_pin, LOW);
-  duration = pulseIn(echo_pin, HIGH);
+  duration = pulseIn(echo_pin, HIGH, 30000);
   distanceCm = duration * 0.0343 / 2;
 
   // Read light denisty
