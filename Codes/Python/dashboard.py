@@ -1,5 +1,7 @@
 import serial
 import matplotlib.pyplot as plt
+import csv
+from datetime import datetime
 from matplotlib.animation import FuncAnimation
 from collections import deque
 
@@ -16,6 +18,11 @@ ax_temp = axes[0, 0]
 ax_hum  = axes[0, 1]
 ax_dist = axes[1, 0]
 ax_light= axes[1, 1]
+
+csv_file = open("sensor_log.csv", 'w', newline='')
+csv_writer = csv.writer(csv_file)
+
+csv_writer.writerow(["Timestamp", "Temperature", "Humidity", "Distance", "Light"])
 
 def setup_axes():
     ax_temp.set_title("Temperature")
@@ -37,6 +44,8 @@ def update(frame):
 
     try:
         h, t, d, l = map(float, line.split(','))
+
+        csv_writer.writerow([datetime.now(), h, t, d, l])
 
         temps.append(t)
         hums.append(h)
