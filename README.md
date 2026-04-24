@@ -1,151 +1,167 @@
-# 📊 Smart Sensor Dashboard --- Arduino + Python Monitoring System
+# Smart Sensor Dashboard — Arduino + Python Monitoring System
 
-## 📌 Overview
+Real-time environmental monitoring system. An Arduino reads temperature, humidity, distance, and light sensors simultaneously, sends structured CSV data over serial, and a Python dashboard plots all four live while logging to CSV for analysis.
 
-This project is a real-time sensor monitoring system that integrates
-**Arduino-based data acquisition** with a **Python dashboard for
-visualization and logging**.
+---
 
-The system reads multiple environmental sensors (temperature, humidity,
-distance, and light intensity), sends structured data via serial
-communication, and displays it live while saving it for further
-analysis.
+## Demo
 
-------------------------------------------------------------------------
+![Dashboard screenshot](Data/Screenshots/Dashboard.png)
 
-## 🚀 Features
+---
 
--   📡 Multi-sensor data acquisition using Arduino\
--   🔌 Real-time serial communication (UART)\
--   📊 Live dashboard with 4 plots (Temperature, Humidity, Distance,
-    Light)\
--   💾 Data logging to CSV with timestamps\
--   🧼 Clean modular embedded code using structs and functions\
--   ⚡ Real-time updates using animation
+## Hardware
 
-------------------------------------------------------------------------
+| Component | Purpose |
+|-----------|---------|
+| Arduino Uno | Microcontroller — reads sensors and sends serial data |
+| DHT11 | Temperature (°C) and humidity (%) |
+| HC-SR04 | Ultrasonic distance (cm) |
+| LDR + 10kΩ resistor | Light intensity (raw ADC 0–1023) |
+| Breadboard + jumper wires | Connections |
 
-## 🏗️ System Architecture
+---
 
-Sensors → Arduino → Serial (UART) → Python Dashboard → Plot + CSV
-Logging → (MATLAB Analysis - coming soon)
+## Wiring
 
-------------------------------------------------------------------------
+### DHT11
 
-## 🔌 Hardware Components
+![DHT11 connection](Data/DTH11%20sensor/DTH11_arduio_connection.png)
 
--   Arduino Uno\
--   DHT11 (Temperature & Humidity sensor)\
--   HC-SR04 (Ultrasonic distance sensor)\
--   LDR (Light sensor)\
--   Breadboard + resistors + jumper wires
+| DHT11 Pin | Arduino Pin |
+|-----------|-------------|
+| VCC | 5V |
+| GND | GND |
+| Data | Digital Pin 3 |
 
-------------------------------------------------------------------------
+---
 
-## 🔧 Sensor Connections
+### HC-SR04 (Ultrasonic)
 
-### 🌡️ DHT11
+![Ultrasonic connection](Data/Ultrasonic%20sensor/Ultrasonic_arduio_connection.png)
 
--   VCC → 5V\
--   GND → GND\
--   Data → Digital Pin 3
+| HC-SR04 Pin | Arduino Pin |
+|-------------|-------------|
+| VCC | 5V |
+| GND | GND |
+| Trig | Digital Pin 9 |
+| Echo | Digital Pin 10 |
 
-### 📏 HC-SR04 (Ultrasonic)
+---
 
--   VCC → 5V\
--   GND → GND\
--   Trig → Pin 9\
--   Echo → Pin 10
+### LDR (Light sensor)
 
-### 💡 LDR
+![LDR connection](Data/LDR/LDR_arduio_connection.png)
 
--   One side → 5V\
--   Other side → Analog Pin A0\
--   Resistor (10kΩ) → GND (voltage divider)
+| LDR side | Connection |
+|----------|------------|
+| One leg | 5V |
+| Other leg | Analog Pin A0 + 10kΩ resistor to GND (voltage divider) |
 
-------------------------------------------------------------------------
+---
 
-## 🧠 Software Components
+## System Architecture
 
--   Arduino (C/C++) → Sensor reading & data transmission\
--   Python → Data acquisition, visualization, logging\
--   CSV → Data storage\
--   MATLAB *(to be added)* → Data analysis
+```
+Sensors → Arduino (C++) → Serial UART → Python dashboard.py → Live plots + CSV log
+                                                                       ↓
+                                                              MATLAB analyze_sensors.m
+```
 
-------------------------------------------------------------------------
+---
 
-## 📊 Example Data Format
+## Serial Data Format
 
-humidity,temperature,distance,light\
-45.2,26.1,120.5,350
+Arduino sends one CSV line every 200 ms:
 
-------------------------------------------------------------------------
+```
+humidity,temperature,distance,light
+44.0,23.8,59.84,805
+```
 
-## 📷 Dashboard Features
+---
 
--   4 real-time plots:
-    -   Temperature (°C)
-    -   Humidity (%)
-    -   Distance (cm)
-    -   Light (Raw ADC)
--   Last 100 samples displayed (using deque)
--   Auto-updating every 200 ms
--   Exit using keyboard (e.g., press 'q')
+## How to Run
 
-------------------------------------------------------------------------
+**1. Flash the Arduino**
 
-## 📁 Project Structure
+Open `Codes/system/` in PlatformIO and upload to the board.
 
-/project\
-├── arduino/\
-│ └── sensor_reading.ino\
-├── python/\
-│ └── dashboard.py\
-├── data/\
-│ └── sensor_log.csv\
-└── README.md
+**2. Install Python dependencies**
 
-------------------------------------------------------------------------
+```bash
+pip install pyserial matplotlib
+```
 
-## 🎯 What I Learned
+**3. Set your COM port**
 
--   📡 Interfacing multiple sensors with Arduino\
--   🔌 Serial communication (UART)\
--   🧠 Structuring embedded code using structs and functions\
--   🐍 Python serial communication using pyserial\
--   📊 Real-time data visualization using Matplotlib\
--   💾 Data logging using CSV\
--   ⚡ Event-driven programming\
--   🧼 Writing clean modular code
+Edit line 8 of `Codes/Python/dashboard.py`:
 
-------------------------------------------------------------------------
+```python
+ser = serial.Serial('COM3', 9600)   # change COM3 to your port
+```
 
-## 🔥 Future Improvements
+On Linux/Mac use `/dev/ttyUSB0` or `/dev/ttyACM0`.
 
--   📈 MATLAB data analysis\
--   🖥️ GUI dashboard (PyQt / Tkinter)\
--   📡 Wireless communication\
--   🤖 ROS 2 integration\
--   📊 Signal filtering
+**4. Run the dashboard**
 
-------------------------------------------------------------------------
-
-## ▶️ How to Run
-
-pip install pyserial matplotlib\
+```bash
+cd Codes/Python
 python dashboard.py
+```
 
-------------------------------------------------------------------------
+Close the Arduino Serial Monitor before running — only one program can hold the serial port at a time.
 
-## 💡 Notes
+Data is saved automatically to `sensor_log.csv` in the same folder.
 
--   Select correct COM port\
--   Close Arduino Serial Monitor before running Python\
--   Use newline='' in CSV to avoid blank lines
+---
 
-------------------------------------------------------------------------
+## Project Structure
 
-## 👨‍💻 Author
+```
+Smart-Sensor-Dashboard/
+├── Codes/
+│   ├── system/          ← Combined Arduino code (main project)
+│   │   └── src/main.cpp
+│   ├── DHT11/           ← Individual sensor test
+│   ├── LDR/             ← Individual sensor test
+│   ├── Ultrasonic/      ← Individual sensor test
+│   └── Python/
+│       ├── dashboard.py ← Main script: live plots + CSV logging
+│       └── serial_comm.py
+├── Data/
+│   ├── DTH11 sensor/    ← Datasheet + wiring photo
+│   ├── LDR/             ← Datasheet + wiring photo
+│   ├── Ultrasonic sensor/ ← Datasheet + wiring photo
+│   ├── Screenshots/     ← Dashboard demo screenshot
+│   └── sensor_log.csv   ← Example logged data
+└── README.md
+```
 
-Ahmed Shalash\
-Mechatronics Engineer \| Robotics & Automation Enthusiast
+---
+
+## What I Learned
+
+- Interfacing DHT11, HC-SR04, and LDR simultaneously on Arduino
+- Structuring embedded C++ using structs and functions — clean `loop()` with no raw globals
+- Serial UART communication and CSV-formatted data framing
+- Python `pyserial` for reading serial data
+- Matplotlib `FuncAnimation` for real-time plotting without blocking
+- `collections.deque` with `maxlen` for a rolling window of data
+- Python `csv` module and `datetime` for timestamped data logging
+
+---
+
+## Future Improvements
+
+- MATLAB `analyze_sensors.m` — statistical analysis of logged CSV data
+- Signal filtering (moving average on noisy distance readings)
+- GUI dashboard using PyQt or Tkinter
+- Wireless communication via ESP32
+- ROS2 integration as a sensor node
+
+---
+
+## Author
+
+Ahmed Shalash — Mechatronics Engineer | Robotics & Automation
