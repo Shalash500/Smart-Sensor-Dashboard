@@ -21,7 +21,6 @@ ax_light= axes[1, 1]
 
 csv_file = open("sensor_log.csv", 'w', newline='')
 csv_writer = csv.writer(csv_file)
-
 csv_writer.writerow(["Timestamp", "Temperature", "Humidity", "Distance", "Light"])
 
 def setup_axes():
@@ -69,5 +68,9 @@ def update(frame):
 
 ani = FuncAnimation(fig, update, interval=200)
 
-plt.tight_layout()
-plt.show()
+try:
+    plt.tight_layout()
+    plt.show()
+finally:
+    csv_file.close()
+    ser.close()
