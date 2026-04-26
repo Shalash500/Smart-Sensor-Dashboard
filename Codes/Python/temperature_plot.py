@@ -19,5 +19,5 @@ while True:
         plt.title("Temperature")
         plt.pause(0.01)
 
-    except:
+    except ValueError:
         continue

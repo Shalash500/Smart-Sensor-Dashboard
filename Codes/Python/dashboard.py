@@ -64,7 +64,7 @@ def update(frame):
         ax_dist.plot(dists)
         ax_light.plot(lights)
 
-    except:
+    except ValueError:
         pass
 
 ani = FuncAnimation(fig, update, interval=200)

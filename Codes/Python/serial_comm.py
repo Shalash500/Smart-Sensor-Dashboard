@@ -20,5 +20,5 @@ while True:
 
         print(h, t, d, l)
 
-    except:
+    except ValueError:
         continue
