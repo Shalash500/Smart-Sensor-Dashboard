@@ -1,6 +1,6 @@
 # Smart Sensor Dashboard — Arduino + Python Monitoring System
 
-Real-time environmental monitoring system. An Arduino reads temperature, humidity, distance, and light sensors simultaneously, sends structured CSV data over serial, and a Python dashboard plots all four live while logging to CSV for analysis.
+Real-time environmental monitoring system. An Arduino reads temperature, humidity, distance, and light sensors simultaneously, sends structured CSV data over serial, and a Python dashboard plots all four live while logging to CSV for MATLAB analysis.
 
 ---
 
@@ -65,7 +65,8 @@ Real-time environmental monitoring system. An Arduino reads temperature, humidit
 ```
 Sensors → Arduino (C++) → Serial UART → Python dashboard.py → Live plots + CSV log
                                                                        ↓
-                                                              MATLAB analyze_sensors.m
+                                                         MATLAB smart_sensor_dashboard.m
+                                                         (statistics + analysis plots)
 ```
 
 ---
@@ -82,6 +83,8 @@ humidity,temperature,distance,light
 ---
 
 ## How to Run
+
+### Python Dashboard (live monitoring)
 
 **1. Flash the Arduino**
 
@@ -110,9 +113,23 @@ cd Codes/Python
 python dashboard.py
 ```
 
-Close the Arduino Serial Monitor before running — only one program can hold the serial port at a time.
+Close the Arduino Serial Monitor before running — only one program can hold the serial port at a time. Data is saved automatically to `sensor_log.csv`. Press Ctrl+C to stop — the port and file close cleanly.
 
-Data is saved automatically to `sensor_log.csv` in the same folder.
+---
+
+### MATLAB Analysis (offline)
+
+**1.** Open MATLAB and navigate to `Codes/MATLAB/`
+
+**2.** Make sure `sensor_log.csv` is in the same folder (copied from `Codes/Python/` after a run)
+
+**3.** Run:
+
+```matlab
+smart_sensor_dashboard
+```
+
+This prints mean, max, min, and std for all four sensors, opens a 2×2 subplot figure, and saves it as `sensor_analysis.png`.
 
 ---
 
@@ -121,20 +138,23 @@ Data is saved automatically to `sensor_log.csv` in the same folder.
 ```
 Smart-Sensor-Dashboard/
 ├── Codes/
-│   ├── system/          ← Combined Arduino code (main project)
+│   ├── system/            ← Combined Arduino code (main project)
 │   │   └── src/main.cpp
-│   ├── DHT11/           ← Individual sensor test
-│   ├── LDR/             ← Individual sensor test
-│   ├── Ultrasonic/      ← Individual sensor test
-│   └── Python/
-│       ├── dashboard.py ← Main script: live plots + CSV logging
-│       └── serial_comm.py
+│   ├── DHT11/             ← Individual sensor test
+│   ├── LDR/               ← Individual sensor test
+│   ├── Ultrasonic/        ← Individual sensor test
+│   ├── Python/
+│   │   ├── dashboard.py   ← Main script: live plots + CSV logging
+│   │   └── serial_comm.py
+│   └── MATLAB/
+│       ├── smart_sensor_dashboard.m  ← Statistics + analysis plots
+│       └── sensor_log.csv            ← Example logged data
 ├── Data/
-│   ├── DTH11 sensor/    ← Datasheet + wiring photo
-│   ├── LDR/             ← Datasheet + wiring photo
+│   ├── DTH11 sensor/      ← Datasheet + wiring photo
+│   ├── LDR/               ← Datasheet + wiring photo
 │   ├── Ultrasonic sensor/ ← Datasheet + wiring photo
-│   ├── Screenshots/     ← Dashboard demo screenshot
-│   └── sensor_log.csv   ← Example logged data
+│   ├── Screenshots/       ← Dashboard demo screenshot
+│   └── sensor_log.csv     ← Example logged data
 └── README.md
 ```
 
@@ -149,19 +169,12 @@ Smart-Sensor-Dashboard/
 - Matplotlib `FuncAnimation` for real-time plotting without blocking
 - `collections.deque` with `maxlen` for a rolling window of data
 - Python `csv` module and `datetime` for timestamped data logging
-
----
-
-## Future Improvements
-
-- MATLAB `analyze_sensors.m` — statistical analysis of logged CSV data
-- Signal filtering (moving average on noisy distance readings)
-- GUI dashboard using PyQt or Tkinter
-- Wireless communication via ESP32
-- ROS2 integration as a sensor node
+- Proper exception handling — `ValueError` for bad data, `finally` for clean resource release
+- MATLAB `readtable()`, `subplot()`, and basic statistical functions
 
 ---
 
 ## Author
 
 Ahmed Shalash — Mechatronics Engineer | Robotics & Automation
+ahmed02shalash@gmail.com
